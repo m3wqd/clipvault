@@ -1,75 +1,99 @@
 # ClipVault
 
-A local clipboard manager built with Rust, Tauri 2, React, TypeScript and SQLite. Search copied text, restore images, keep snippets and organize history without uploading clipboard contents.
+**Русский** | [English](README.en.md)
 
-**Version 0.2.0 — development preview. Windows x64 EXE and NSIS Setup have been cross-compiled on Linux. Installation and runtime behavior on Windows have not been tested. This is not an acceptance-complete production release.**
+Локальный менеджер буфера обмена на Rust, Tauri 2, React, TypeScript и SQLite. ClipVault сохраняет историю текста и изображений, помогает находить ранее скопированное, хранить шаблоны и группировать записи без отправки содержимого на сервер.
 
-## Install the supplied Windows build
+**Версия 0.2.0 — тестовая сборка. Windows x64 EXE и NSIS Setup собраны на Linux посредством кросс-компиляции. Установка и работа на Windows ещё не проверены. Критерии готовности production-релиза пока не выполнены.**
 
-Preview binaries, checksums and instructions are attached to the repository’s [draft releases](https://github.com/m3wqd/clipvault/releases). Drafts are visible to repository collaborators with the required access.
+## Установка на Windows
 
-Use `ClipVault-0.2.0-x64-setup.exe` supplied alongside the source archive. No Rust or Node.js is needed for normal installation. The per-user installer offers a destination directory, Start menu shortcuts, an optional desktop shortcut, and an uninstaller. It includes Microsoft's WebView2 bootstrapper: if WebView2 is missing, internet access is required to install the runtime. The portable `ClipVault-0.2.0-x64.exe` requires an installed WebView2 Runtime.
+EXE, установщик, контрольные суммы и инструкция находятся в [черновике релиза](https://github.com/m3wqd/clipvault/releases). Доступ к черновикам зависит от прав пользователя в репозитории.
 
-The application and installer are unsigned. Windows may display a publisher/SmartScreen warning. Checksums accompany the delivered binaries; checksums do not replace a publisher signature. Quit ClipVault from its tray before updating or uninstalling. Normal uninstall preserves history and settings.
+Для обычной установки запустите `ClipVault-0.2.0-x64-setup.exe`. Rust и Node.js не требуются. Установщик работает для текущего пользователя, позволяет выбрать папку, создаёт ярлыки в меню «Пуск», предлагает необязательный ярлык на рабочем столе и устанавливает программу удаления. Если Microsoft WebView2 отсутствует, включённый в установщик загрузчик Microsoft установит среду выполнения; для этого нужен интернет.
 
-## Implemented
+Отдельный `ClipVault-0.2.0-x64.exe` требует уже установленной среды Microsoft WebView2 Runtime.
 
-- Automatic text capture, URL/code categorization and SQLite persistence.
-- BLAKE3 deduplication, timestamps and copy counts.
-- FTS5 token-prefix search, type, time, tag, favorite and collection filters; date/frequency sorting and 200-row pagination.
-- Pin, favorite, delete, restore to system clipboard and pause/resume.
-- Images stored as PNG files, thumbnail IPC, decoded dimension/size limits, and orphan-file reconciliation.
-- Native arboard adapter for Windows/X11; wl-paste/wl-copy adapter for Wayland text and PNG.
-- Tray menu, single-instance guard, close-to-tray setting, Quick Popup, arrow/Enter/Esc navigation and default Ctrl+Shift+V shortcut on supported desktops.
-- Snippet create/edit/delete/search/copy; collections, many-to-many tags and collection membership.
-- Persistent retention/size limits, incognito, optional recognition of some sensitive token patterns, dark/light theme and partial English/Russian localization.
-- Explicit opt-in autostart. No automatic paste: restore, then press Ctrl+V in the destination.
+Приложение и установщик не подписаны: Windows может показать предупреждение SmartScreen или неизвестного издателя. Контрольные суммы позволяют проверить целостность файлов, но не заменяют подпись. Перед обновлением или удалением завершите приложение через пункт **Quit** в трее. Обычное удаление сохраняет историю и настройки.
 
-## Known gaps
+## Возможности
 
-Event-driven clipboard notification adapters, Wayland watch-protocol negotiation, full localization, configurable data directory, native platform integration tests, measured CPU/RAM profiling, screenshots/GIFs and signed releases remain unfinished. Identical copies without a different clipboard value between them cannot be reliably counted by the polling adapter. Linux packages and MSI have configuration/scripts but were not built here. The updater is intentionally absent until signing and release URLs are configured. Windows owner/source attribution and application exclusions are implemented but untested on Windows. This repository preserves the development-preview status; binary artifacts are attached to a draft release, not a production release.
+- Автоматическое сохранение текста, определение URL и фрагментов кода, хранение истории в SQLite.
+- Дедупликация через BLAKE3, время копирования и счётчик повторений.
+- Поиск FTS5 по началу слов; фильтры по типу, времени, тегам, избранному и коллекциям; сортировка по дате и частоте; страницы по 200 записей.
+- Закрепление, избранное, удаление, восстановление записи в системный буфер и Pause/Resume.
+- Изображения в отдельных PNG-файлах, миниатюры, ограничения размера и удаление файлов, на которые больше нет ссылок в базе.
+- Адаптер arboard для Windows/X11; `wl-paste` и `wl-copy` для текста и PNG в Wayland.
+- Системный трей, защита от запуска нескольких экземпляров, закрытие в трей, Quick Popup, управление стрелками, Enter и Esc. Сочетание по умолчанию — **Ctrl+Shift+V** в поддерживаемых окружениях.
+- Создание, редактирование, удаление, поиск и копирование текстовых шаблонов; коллекции и связи many-to-many для тегов и коллекций.
+- Сохраняемые лимиты размера и срока хранения, инкогнито, необязательное распознавание некоторых маркеров чувствительных данных, тёмная и светлая темы, частичная русская и английская локализация.
+- Автозапуск только по явному выбору пользователя. Автоматической вставки нет: выберите запись, затем нажмите **Ctrl+V** в нужном приложении.
 
-Wayland global shortcuts must be bound by the compositor. For Hyprland, after installing the executable, add a binding such as `bind = CTRL SHIFT, V, exec, clipvault --popup`. ClipVault does not bypass compositor restrictions. wl-clipboard access and supported MIME formats vary by session. PNG is the supported Wayland image MIME type; Windows/X11 image decoding is provided by arboard.
+## Что ещё не готово
 
-## Privacy and data
+Остаются событийные адаптеры отслеживания буфера, проверка протоколов `wl-paste --watch`, полный перевод интерфейса, выбор каталога данных, интеграционные тесты на целевых ОС, измерение CPU/RAM, скриншоты и GIF-демонстрация, подпись релизов. Опрос буфера может пропустить быстрые изменения и не позволяет надёжно учитывать повторное копирование одинакового содержимого без промежуточного изменения.
 
-Clipboard history can contain passwords and personal information. Storage is **not encrypted**. Pause or enable incognito before copying secrets. Pattern recognition only catches a small set of private key/token markers; it cannot reliably identify passwords. No clipboard content is logged or sent to a service. App history is local; WebView2 bootstrap installation and developer dependency downloads are separate network operations.
+Для MSI и Linux-пакетов подготовлены конфигурации и сценарии, но сами пакеты здесь не собраны. Обновлятор отсутствует до настройки подписей и адресов релизов. Определение владельца буфера и исключения приложений реализованы для Windows, но на Windows ещё не проверены. Файлы доступны как черновик тестового релиза.
 
-Data is stored in Tauri's application data directory for `io.clipvault.desktop`:
+В Wayland глобальное сочетание нужно назначать средствами композитора. Например, для Hyprland после установки исполняемого файла можно задать `bind = CTRL SHIFT, V, exec, clipvault --popup`. Приложение не обходит ограничения композитора. Доступность буфера и форматов зависит от сессии. Для изображений в Wayland поддерживается MIME-тип PNG; на Windows/X11 декодирование обеспечивает arboard.
 
-- Windows: `%APPDATA%\io.clipvault.desktop`
-- Linux: `${XDG_DATA_HOME:-~/.local/share}/io.clipvault.desktop`
+## Платформы
 
-The directory contains `history.db` (plus SQLite WAL/SHM files) and `images/`. Linux directory permissions are 0700; Windows inherits current-user app-data ACLs. Settings provides confirmed history deletion, optionally including pinned records. To remove **all** data, quit the app, back up anything needed, then explicitly remove this application directory. Uninstall alone does not remove it.
+Целевые платформы — Windows 11 x64 и Linux. Ниже перечислены предполагаемые Linux-окружения; **это не список дистрибутивов с подтверждённой совместимостью**.
 
-## Build from source
+| Дистрибутив | Сборка и пакеты |
+| --- | --- |
+| Arch Linux | Есть PKGBUILD для локального архива исходников; сборка пакета и работа в desktop-сессии требуют проверки. |
+| Ubuntu / Debian | Подготовлены конфигурации DEB и AppImage; пакеты здесь не собирались. |
+| Linux Mint и другие дистрибутивы на базе Ubuntu | Совместимость зависит от базовой системы и доступных зависимостей Tauri; не проверена. |
+| Fedora | Для сборки из исходников нужны зависимости Tauri для этого дистрибутива; совместимость не проверена. |
+| openSUSE и другие популярные Linux-дистрибутивы | Требуется проверка сборки из исходников и возможной совместимости AppImage на целевой системе. |
 
-Install stable Rust, Node.js 22 LTS/npm and the [official Tauri prerequisites](https://v2.tauri.app/start/prerequisites/). Windows needs Visual Studio C++ Build Tools and WebView2. Linux needs WebKitGTK 4.1, GTK 3 and platform development libraries.
+Для Linux нужны WebKitGTK 4.1, GTK 3 и соответствующие платформенные библиотеки. Списки пакетов для разных дистрибутивов приведены в [официальных требованиях Tauri](https://v2.tauri.app/start/prerequisites/). Для X11 и Wayland используются разные адаптеры; Wayland требует `wl-clipboard` и поддержки со стороны композитора. Формат AppImage сам по себе не гарантирует работу на любом дистрибутиве.
+
+## Приватность и данные
+
+В историю могут попасть пароли и персональные сведения. Хранилище **не зашифровано**. Перед копированием секретов приостанавливайте отслеживание или включайте инкогнито. Распознавание шаблонов охватывает лишь некоторые маркеры приватных ключей и токенов и не даёт надёжной защиты паролей.
+
+Содержимое буфера не записывается в логи и не отправляется в сервис. История хранится локально. Загрузка WebView2 при установке и загрузка зависимостей для разработки — отдельные сетевые операции.
+
+Данные находятся в каталоге приложения Tauri с идентификатором `io.clipvault.desktop`:
+
+- Windows: `%APPDATA%\io.clipvault.desktop`.
+- Linux: `${XDG_DATA_HOME:-~/.local/share}/io.clipvault.desktop`.
+
+Внутри находятся `history.db`, служебные SQLite-файлы WAL/SHM и каталог `images/`. На Linux для каталога устанавливаются права 0700; Windows использует унаследованные права каталога данных текущего пользователя.
+
+В настройках есть подтверждаемая очистка истории, включая закреплённые записи по отдельному выбору. Для удаления **всех** данных завершите приложение, сохраните нужное и явно удалите каталог приложения. Обычное удаление программы этого не делает.
+
+## Сборка из исходников
+
+Установите stable Rust, Node.js 22 LTS/npm и зависимости из [официальной инструкции Tauri](https://v2.tauri.app/start/prerequisites/). Для Windows нужны Visual Studio C++ Build Tools и WebView2. Для Linux — WebKitGTK 4.1, GTK 3 и платформенные библиотеки разработки.
 
 ```sh
 npm ci
 npm run tauri dev
 ```
 
-Windows EXE/MSI installer build with checks:
+Сборка Windows EXE/MSI с проверками:
 
 ```powershell
 ./packaging/scripts/build-windows.ps1
 ```
 
-Or double-click `build-windows.cmd`. Build tools are required only for building source, not installing the delivered Setup. The script writes `dist-installers/` and stops if either required installer is absent.
+Также можно запустить `build-windows.cmd`. Инструменты разработки нужны для сборки исходников, а не для установки готового Setup. Сценарий сохраняет пакеты в `dist-installers/` и завершится ошибкой, если один из обязательных установщиков отсутствует.
 
-Linux:
+Сборка для Linux:
 
 ```sh
 npm run tauri build -- --config src-tauri/tauri.linux.conf.json --bundles appimage,deb
 ```
 
-For Arch/CachyOS, create a source tarball rooted at `clipvault/`, named `clipvault-0.2.0.tar.gz`; place it next to `packaging/arch/PKGBUILD` and run `makepkg -si` as a non-root user. This is a local source PKGBUILD, not an AUR publication. Its local source checksum is intentionally SKIP; replace it with the independently verified archive hash for distribution.
+Для Arch Linux подготовьте архив `clipvault-0.2.0.tar.gz` с корневым каталогом `clipvault/`, положите его рядом с `packaging/arch/PKGBUILD` и выполните `makepkg -si` от обычного пользователя. Это локальный PKGBUILD, а не опубликованный пакет AUR. Для локального архива указана контрольная сумма `SKIP`; перед распространением замените её независимо проверенным хешем архива.
 
-The delivered Setup was created on Linux using `cargo-xwin` and the checked-in custom NSIS script. The native Windows script instead uses Tauri's NSIS/WiX templates. Both packaging routes require installation testing before public distribution; see [packaging notes](docs/packaging.md).
+Предоставленный Setup собран на Linux через `cargo-xwin` и включённый в репозиторий собственный NSIS-сценарий. Сценарий для нативной сборки на Windows использует шаблоны NSIS/WiX от Tauri. Обе схемы упаковки требуют проверки установки перед распространением; подробности — в [заметках об упаковке](docs/packaging.md).
 
-## Validation
+## Проверки
 
 ```sh
 npm run build
@@ -80,23 +104,23 @@ cargo test --manifest-path src-tauri/Cargo.toml --no-default-features --lib --lo
 python3 tests/schema_test.py
 ```
 
-Actual checks and remaining acceptance work are recorded in [validation](docs/validation.md). Tests use temporary data; application runtime never seeds demonstration history. Browser-only mode cannot access history and reports an IPC connection error.
+Фактически выполненные проверки и оставшиеся сценарии перечислены в [отчёте](docs/validation.md). Тесты используют временные данные; приложение не заполняет историю демонстрационными записями. В браузерном режиме доступ к истории отсутствует и отображается ошибка подключения IPC.
 
-## Architecture
+## Архитектура
 
 ```mermaid
 flowchart LR
-  React[React main window + popup] -->|typed requests| IPC[Tauri commands]
-  IPC -->|bounded channel| Worker[Rust service thread]
-  Worker --> SQLite[SQLite + FTS5 + migrations]
-  Worker --> Images[PNG image store]
+  React[React: главное окно и popup] -->|типизированные запросы| IPC[Tauri Commands]
+  IPC -->|ограниченная очередь| Worker[Рабочий Rust-поток]
+  Worker --> SQLite[SQLite + FTS5 + миграции]
+  Worker --> Images[PNG-хранилище]
   Worker --> Adapter[arboard / wl-clipboard]
-  Adapter --> Clipboard[System clipboard]
-  Worker -->|events| React
+  Adapter --> Clipboard[Системный буфер]
+  Worker -->|события| React
 ```
 
-The worker owns clipboard and database objects. SQL values are bound; FTS terms are quoted. Image names are generated hashes and validated before reads. Restoring contents suppresses capture of the same value. See [architecture](docs/architecture.md).
+Рабочий поток владеет объектами буфера и базы. SQL-параметры передаются через привязку, поисковые термы FTS экранируются. Имена изображений генерируются из хешей и проверяются перед чтением. Восстановление записи подавляет её повторный захват. Подробнее — в [описании архитектуры](docs/architecture.md).
 
-GitHub Actions separately validates/packages Windows and Linux, with required-artifact checks and SHA-256 files. Workflows are prepared, but no successful CI run is claimed. Updater signing and public release publication remain disabled.
+GitHub Actions раздельно проверяет и собирает Windows и Linux, проверяет наличие обязательных пакетов и создаёт SHA-256. Workflows подготовлены, но успешный запуск CI не заявляется. Подпись обновлений и публикация публичного релиза пока не настроены.
 
-MIT license. See CONTRIBUTING.md.
+Лицензия [MIT](LICENSE). Правила участия — в [CONTRIBUTING.md](CONTRIBUTING.md).
