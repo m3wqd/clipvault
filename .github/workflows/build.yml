@@ -1,0 +1,90 @@
+name: Validate and package
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: Check and build EXE + MSI
+        shell: pwsh
+        run: ./packaging/scripts/build-windows.ps1
+      - uses: actions/upload-artifact@v6
+        with:
+          name: windows-installers
+          path: dist-installers/*
+          if-no-files-found: error
+  linux:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+      - name: System dependencies
+        run: sudo apt-get update && sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+      - run: npm ci
+      - run: npm run build && npm test
+      - run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
+      - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --locked -- -D warnings
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - run: npm run tauri build -- --config src-tauri/tauri.linux.conf.json --bundles appimage,deb
+      - name: Require bundles and checksums
+        run: |
+          test -n "$(find src-tauri/target/release/bundle -name '*.AppImage' -print -quit)"
+          test -n "$(find src-tauri/target/release/bundle -name '*.deb' -print -quit)"
+          find src-tauri/target/release/bundle -type f \( -name '*.AppImage' -o -name '*.deb' \) -exec sha256sum {} + > SHA256SUMS-linux.txt
+      - uses: actions/upload-artifact@v6
+        with:
+          name: linux-installers
+          path: |
+            src-tauri/target/release/bundle/appimage/*.AppImage
+            src-tauri/target/release/bundle/deb/*.deb
+            SHA256SUMS-linux.txt
+          if-no-files-found: error
+
+  draft-release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [windows, linux]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/download-artifact@v6
+        with:
+          path: release-artifacts
+          merge-multiple: true
+      - name: Create draft only after all required packages succeed
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          python3 - <<'PYCODE'
+          import json, os, pathlib, subprocess
+          version = json.loads(pathlib.Path('package.json').read_text())['version']
+          tag = os.environ['RELEASE_TAG']
+          if tag != 'v' + version:
+              raise SystemExit('Tag does not match application version')
+          files = sorted(str(p) for p in pathlib.Path('release-artifacts').rglob('*') if p.is_file())
+          for extension in ('.exe', '.msi', '.AppImage', '.deb'):
+              if not any(f.endswith(extension) for f in files):
+                  raise SystemExit('Missing required artifact: ' + extension)
+          subprocess.run(['gh', 'release', 'create', tag, '--draft', '--verify-tag', '--generate-notes', *files], check=True)
+          PYCODE

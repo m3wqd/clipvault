@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=ClipVault
+Comment=Local clipboard history
+Exec=clipvault
+Icon=clipvault
+Terminal=false
+Categories=Utility;
+StartupNotify=true

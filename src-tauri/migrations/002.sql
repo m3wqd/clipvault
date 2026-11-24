@@ -1,0 +1,12 @@
+BEGIN IMMEDIATE;
+ALTER TABLE clipboard_items ADD COLUMN favorite INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE clipboard_items ADD COLUMN image_path TEXT;
+CREATE TABLE snippets(id INTEGER PRIMARY KEY, title TEXT NOT NULL, body TEXT NOT NULL, category TEXT NOT NULL DEFAULT '');
+CREATE TABLE tags(id INTEGER PRIMARY KEY,name TEXT NOT NULL UNIQUE);
+CREATE TABLE item_tags(item_id INTEGER NOT NULL REFERENCES clipboard_items(id) ON DELETE CASCADE,tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,PRIMARY KEY(item_id,tag_id));
+CREATE TABLE collections(id INTEGER PRIMARY KEY,name TEXT NOT NULL UNIQUE);
+CREATE TABLE collection_items(item_id INTEGER NOT NULL REFERENCES clipboard_items(id) ON DELETE CASCADE,collection_id INTEGER NOT NULL REFERENCES collections(id) ON DELETE CASCADE,PRIMARY KEY(item_id,collection_id));
+CREATE TABLE settings(key TEXT PRIMARY KEY,value TEXT NOT NULL);
+CREATE INDEX items_favorite ON clipboard_items(favorite,last_copied DESC);
+PRAGMA user_version=2;
+COMMIT;

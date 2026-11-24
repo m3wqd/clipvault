@@ -1,0 +1,26 @@
+# Build from the source archive next to this PKGBUILD.
+pkgname=clipvault
+pkgver=0.2.0
+pkgrel=1
+pkgdesc='Local clipboard history and snippets'
+arch=('x86_64')
+url='https://github.com/m3wqd/clipvault'
+license=('MIT')
+depends=('webkit2gtk-4.1' 'gtk3' 'libappindicator-gtk3' 'libxdo')
+makedepends=('rust' 'nodejs' 'npm')
+optdepends=('wl-clipboard: Wayland text clipboard adapter')
+source=("clipvault-$pkgver.tar.gz")
+# Local source archive. Verify the archive yourself before building.
+sha256sums=('SKIP')
+build() {
+ cd "$srcdir/clipvault"
+ npm ci
+ npm run tauri build -- --no-bundle -- --locked
+}
+package() {
+ cd "$srcdir/clipvault"
+ install -Dm755 src-tauri/target/release/clipvault "$pkgdir/usr/bin/clipvault"
+ install -Dm644 packaging/arch/clipvault.desktop "$pkgdir/usr/share/applications/clipvault.desktop"
+ install -Dm644 src-tauri/icons/128x128.png "$pkgdir/usr/share/icons/hicolor/128x128/apps/clipvault.png"
+ install -Dm644 LICENSE "$pkgdir/usr/share/licenses/clipvault/LICENSE"
+}

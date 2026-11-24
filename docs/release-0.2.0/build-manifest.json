@@ -1,0 +1,19 @@
+{
+  "version": "0.2.0",
+  "status": "development-preview",
+  "target": "x86_64-pc-windows-msvc",
+  "built": true,
+  "windows_runtime_tested": false,
+  "installer_tested_on_windows": false,
+  "signed": false,
+  "rust_core_tests_passed": 11,
+  "frontend_tests_passed": 4,
+  "python_sqlite_tests_passed": 2,
+  "typescript_build": "passed",
+  "linux_clippy": "passed",
+  "sha256": {
+    "ClipVault-0.2.0-x64.exe": "2a5748263dfb49ef865f1ecfae414b9d3017c93c7dcf54e2206914751c4e0864",
+    "ClipVault-0.2.0-x64-setup.exe": "41b4fcb176b510be1359983a7ac6ec50e3199317eff65b6573c8f8d86e14025d",
+    "ClipVault-0.2.0-source.zip": "590b71562f202bb6062399ac78c32d6ad64495acb973f4e7278f9f95ab201981"
+  }
+}
