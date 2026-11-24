@@ -117,7 +117,9 @@ export function App() {
     if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
     event.preventDefault();
     const index = items.findIndex(i => i.id === selected);
-    setSelected(items[Math.max(0, Math.min(items.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1)))]?.id ?? null);
+    const nextIndex = Math.max(0, Math.min(items.length - 1, index + (event.key === 'ArrowDown' ? 1 : -1)));
+    setSelected(items[nextIndex]?.id ?? null);
+    event.currentTarget.querySelectorAll<HTMLButtonElement>('.row-body')[nextIndex]?.focus();
   }
 
   return <div className="shell">
