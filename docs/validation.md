@@ -43,3 +43,9 @@ Performed for this patch:
 - Windows x64 EXE rebuilt with custom-protocol; static PE verification confirmed that the current Vite JavaScript and CSS asset keys are present in that exact executable.
 
 These checks establish production asset packaging. They do not constitute a full Windows installation or GUI/clipboard test; those remain unverified. The 0.2.0 binaries should not be used.
+
+## Interface update — 0.2.2
+
+Applied the approved graphite/purple design to the application, using actual IPC history rather than seeded records. History rows replace framed cards; the preview keeps copy/pin/favorite/delete actions. Advanced filters and item tags are available through disclosures. Existing history/settings schema is unchanged. Light theme and Quick Popup use the shared palette.
+
+Performed checks: strict TypeScript/Vite build, five frontend tests (including compact filter/favorites navigation), Clippy with custom-protocol and all targets, the production-context embedded HTML/JavaScript regression test, and Windows x64 cross-compilation. The final EXE passed verification against the current Vite JavaScript/CSS asset keys. The compiled browser layout was visually inspected in its IPC-unavailable state; this is not a Windows GUI or clipboard integration test. Windows installation and native visual behavior remain unverified in this environment.

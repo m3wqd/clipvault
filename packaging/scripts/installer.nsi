@@ -6,7 +6,7 @@ Unicode true
  !error "Pass /DAPP_EXE=/absolute/path/clipvault.exe"
 !endif
 !ifndef SETUP_OUT
- !error "Pass /DSETUP_OUT=/absolute/path/ClipVault-0.2.1-x64-setup.exe"
+ !error "Pass /DSETUP_OUT=/absolute/path/ClipVault-0.2.2-x64-setup.exe"
 !endif
 !ifndef WEBVIEW_BOOTSTRAPPER
  !error "Pass /DWEBVIEW_BOOTSTRAPPER=/absolute/path/MicrosoftEdgeWebview2Setup.exe"
@@ -17,10 +17,10 @@ InstallDir "$LOCALAPPDATA\Programs\ClipVault"
 InstallDirRegKey HKCU "Software\ClipVault" "InstallDir"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-VIProductVersion "0.2.1.0"
+VIProductVersion "0.2.2.0"
 VIAddVersionKey /LANG=1033 "ProductName" "ClipVault"
 VIAddVersionKey /LANG=1033 "FileDescription" "ClipVault per-user installer"
-VIAddVersionKey /LANG=1033 "FileVersion" "0.2.1"
+VIAddVersionKey /LANG=1033 "FileVersion" "0.2.2"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "ClipVault contributors"
 !define MUI_ABORTWARNING
 !define MUI_FINISHPAGE_RUN "$INSTDIR\ClipVault.exe"
@@ -77,7 +77,7 @@ Section "ClipVault (required)" Core
  WriteUninstaller "$INSTDIR\Uninstall.exe"
  WriteRegStr HKCU "Software\ClipVault" "InstallDir" "$INSTDIR"
  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "DisplayName" "ClipVault"
- WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "DisplayVersion" "0.2.1"
+ WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "DisplayVersion" "0.2.2"
  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "Publisher" "ClipVault contributors"
  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "InstallLocation" "$INSTDIR"
  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\ClipVault" "UninstallString" '$\"$INSTDIR\Uninstall.exe$\"'
