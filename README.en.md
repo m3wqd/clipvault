@@ -4,13 +4,17 @@
 
 A local clipboard manager built with Rust, Tauri 2, React, TypeScript and SQLite. Search copied text, restore images, keep snippets and organize history without uploading clipboard contents.
 
-**Version 0.2.0 — development preview. Windows x64 EXE and NSIS Setup have been cross-compiled on Linux. Installation and runtime behavior on Windows have not been tested. This is not an acceptance-complete production release.**
+**Version 0.2.1 — development preview. Windows x64 EXE and NSIS Setup have been cross-compiled on Linux. Installation and runtime behavior on Windows have not been tested. This is not an acceptance-complete production release.**
+
+## Startup fix in 0.2.1
+
+Fixed the 0.2.0 build defect that made the Windows EXE navigate to localhost:1420 instead of bundled frontend assets. Version 0.2.1 enables `custom-protocol`; release builds without it are now rejected. No development server is needed to install or launch the app.
 
 ## Install the supplied Windows build
 
 Preview binaries, checksums and instructions are attached to the repository’s [draft releases](https://github.com/m3wqd/clipvault/releases). Drafts are visible to repository collaborators with the required access.
 
-Use `ClipVault-0.2.0-x64-setup.exe` supplied alongside the source archive. No Rust or Node.js is needed for normal installation. The per-user installer offers a destination directory, Start menu shortcuts, an optional desktop shortcut, and an uninstaller. It includes Microsoft's WebView2 bootstrapper: if WebView2 is missing, internet access is required to install the runtime. The portable `ClipVault-0.2.0-x64.exe` requires an installed WebView2 Runtime.
+Use `ClipVault-0.2.1-x64-setup.exe` supplied alongside the source archive. No Rust or Node.js is needed for normal installation. The per-user installer offers a destination directory, Start menu shortcuts, an optional desktop shortcut, and an uninstaller. It includes Microsoft's WebView2 bootstrapper: if WebView2 is missing, internet access is required to install the runtime. The portable `ClipVault-0.2.1-x64.exe` requires an installed WebView2 Runtime.
 
 The application and installer are unsigned. Windows may display a publisher/SmartScreen warning. Checksums accompany the delivered binaries; checksums do not replace a publisher signature. Quit ClipVault from its tray before updating or uninstalling. Normal uninstall preserves history and settings.
 
@@ -81,7 +85,7 @@ Linux:
 npm run tauri build -- --config src-tauri/tauri.linux.conf.json --bundles appimage,deb
 ```
 
-For Arch Linux, create a source tarball rooted at `clipvault/`, named `clipvault-0.2.0.tar.gz`; place it next to `packaging/arch/PKGBUILD` and run `makepkg -si` as a non-root user. This is a local source PKGBUILD, not an AUR publication. Its local source checksum is intentionally SKIP; replace it with the independently verified archive hash for distribution.
+For Arch Linux, create a source tarball rooted at `clipvault/`, named `clipvault-0.2.1.tar.gz`; place it next to `packaging/arch/PKGBUILD` and run `makepkg -si` as a non-root user. This is a local source PKGBUILD, not an AUR publication. Its local source checksum is intentionally SKIP; replace it with the independently verified archive hash for distribution.
 
 The delivered Setup was created on Linux using `cargo-xwin` and the checked-in custom NSIS script. The native Windows script instead uses Tauri's NSIS/WiX templates. Both packaging routes require installation testing before public distribution; see [packaging notes](docs/packaging.md).
 

@@ -43,7 +43,7 @@ jobs:
       - run: npm run build && npm test
       - run: cargo fmt --manifest-path src-tauri/Cargo.toml --check
       - run: cargo clippy --manifest-path src-tauri/Cargo.toml --all-targets --locked -- -D warnings
-      - run: cargo test --manifest-path src-tauri/Cargo.toml --locked
+      - run: cargo test --manifest-path src-tauri/Cargo.toml --features custom-protocol --locked
       - run: npm run tauri build -- --config src-tauri/tauri.linux.conf.json --bundles appimage,deb
       - name: Require bundles and checksums
         run: |

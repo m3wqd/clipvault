@@ -534,3 +534,35 @@ fn run(
         }
     }
 }
+
+#[cfg(all(test, feature = "custom-protocol"))]
+mod production_tests {
+    #[test]
+    fn production_context_embeds_html_and_javascript_without_dev_server() {
+        assert!(!tauri::is_dev(), "Production must not use devUrl");
+        let context: tauri::Context<tauri::Wry> = tauri::generate_context!();
+        let html = context
+            .assets()
+            .get(&"index.html".into())
+            .expect("Embedded index.html missing");
+        let html = std::str::from_utf8(&html).expect("HTML must be UTF-8");
+        let src = html
+            .split("src=\"")
+            .nth(1)
+            .expect("Script reference missing")
+            .split('"')
+            .next()
+            .expect("Script reference malformed");
+        assert!(
+            !src.starts_with("http"),
+            "Frontend must reference a local asset"
+        );
+        assert!(
+            context
+                .assets()
+                .get(&src.trim_start_matches('/').into())
+                .is_some(),
+            "Embedded JavaScript missing"
+        );
+    }
+}

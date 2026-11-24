@@ -27,3 +27,19 @@ This file records performed checks, not target-platform certification.
 ## Acceptance procedure
 
 Use disposable non-sensitive text and images in a target desktop session. Copy A/B/A, verify one A item with updated count, restart, restore A and paste into another application. Repeat with Unicode and an image. Search, pin/favorite, tag and assign collection, remove and restart. Test snippets and popup keyboard navigation. Pause/incognito must prevent recording. Test unavailable clipboard owner, oversized data, disk-full handling, retention with pins and explicit clear confirmation. Verify autostart off by default, close-to-tray and Quit, installer update/data preservation, normal uninstall and deliberate full data removal. Record OS/compositor versions and actual results before declaring production readiness.
+
+## Startup repair — 0.2.1
+
+The 0.2.0 Windows artifact was incorrectly built without Tauri's custom-protocol feature, so it used devUrl (localhost:1420) rather than embedded UI assets. This was an actual packaging defect, not a user configuration issue.
+
+For 0.2.1, the cross-build enables custom-protocol and release builds without it are rejected by build.rs. Verified by invoking the compiled build script with PROFILE=release and no feature flag: it rejected the build with the intended diagnostic.
+
+Performed for this patch:
+
+- Strict TypeScript/Vite production build passed; four frontend tests passed.
+- Eleven Rust core tests and two Python SQLite tests passed.
+- New production-context regression test ran successfully on Linux without starting a dev server: tauri::is_dev() was false, and index.html and its referenced JavaScript were resolved from embedded assets.
+- Clippy with custom-protocol and all targets passed with warnings denied.
+- Windows x64 EXE rebuilt with custom-protocol; static PE verification confirmed that the current Vite JavaScript and CSS asset keys are present in that exact executable.
+
+These checks establish production asset packaging. They do not constitute a full Windows installation or GUI/clipboard test; those remain unverified. The 0.2.0 binaries should not be used.

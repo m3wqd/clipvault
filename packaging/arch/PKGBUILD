@@ -1,6 +1,6 @@
 # Build from the source archive next to this PKGBUILD.
 pkgname=clipvault
-pkgver=0.2.0
+pkgver=0.2.1
 pkgrel=1
 pkgdesc='Local clipboard history and snippets'
 arch=('x86_64')

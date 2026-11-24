@@ -1,6 +1,6 @@
 [package]
 name = "clipvault"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 
 [[bin]]
@@ -10,6 +10,7 @@ required-features = ["desktop"]
 
 [features]
 default = ["desktop"]
+custom-protocol = ["desktop", "tauri/custom-protocol"]
 desktop = ["dep:tauri-build", "dep:tauri", "dep:tauri-plugin-autostart", "dep:tauri-plugin-global-shortcut", "dep:tauri-plugin-single-instance"]
 
 [build-dependencies]
